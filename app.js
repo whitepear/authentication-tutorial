@@ -1,7 +1,19 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+var session = require('express-session');
 var app = express();
+
+// use sessions for tracking logins
+app.use(session({
+	// secret is only req. param. a string that is used to sign the session id cookie. more security.
+	secret: 'treehouse loves you',
+	// resave option forces the session to be saved in the session store, whether anything changed during the request or not.
+  resave: true,
+  // saveUninitialized forces an uninitialized session to be saved in the session store.
+  // an uninitialized session is a new and not yet modified session.
+  saveUninitialized: false
+}))
 
 // mongodb connection
 mongoose.connect("mongodb://localhost:27017/bookworm");

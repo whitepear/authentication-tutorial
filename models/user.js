@@ -32,6 +32,7 @@ var UserSchema = new mongoose.Schema({
 // 'this' is assigned the database object Mongoose is about to insert into Mongo
 UserSchema.pre('save', function (next) {
 	var user = this;
+	// .hash() runs hash & salt in one call
 	// hash takes 3 args: plaintext pass, num, callback (called after hash gen)
 	// num tells bcrypt how many times to apply the encryption algorithm
 	// Bigger numbers, more security, slower to gen

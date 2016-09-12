@@ -11,6 +11,7 @@
     "bcryptjs": "^2.3.0",
     "body-parser": "^1.13.3",
     "express": "^4.13.4",
+    "express-session": "^1.14.1",
     "mongoose": "^4.6.0",
     "pug": "^2.0.0-beta2"
   },
