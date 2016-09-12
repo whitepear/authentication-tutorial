@@ -2,6 +2,24 @@ var express = require('express');
 var router = express.Router();
 var User = require('../models/user');
 
+// GET /profile
+router.get('/profile', function(req, res, next) {
+	// check for presence of session variable 'userId' to ensure user is logged in
+	if (!req.session.userId) {
+		var err = new Error('You are not authorized to view this page.');
+		err.status = 403; // 'forbidden'
+		return next(err);
+	}
+	User.findById(req.session.userId)
+			.exec(function (err, user) {
+				if (err) {
+					return next(err);
+				} else {
+					return res.render('profile', {title: 'Profile', name: user.name, favorite: user.favoriteBook });
+				}
+			});
+});
+
 // GET /login
 router.get('/login', function(req, res, next) {
 	return res.render('login', { title: 'Log In'});
