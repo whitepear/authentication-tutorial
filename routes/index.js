@@ -9,7 +9,28 @@ router.get('/login', function(req, res, next) {
 
 // POST /login
 router.post('/login', function(req, res, next) {
-	return res.send('Logged In!');
+	if (req.body.email && req.body.password) {
+		User.authenticate(req.body.email, req.body.password, function (err, user){
+			if (err || !user) {
+				var err = new Error('Wrong email or password.');
+				err.status = 401;
+				return next(err);
+			} else {
+				// nothing particularly special is required to create a session.
+				// sensitive info remains on the server. the cookie that reaches the client will contain a sessionID, not a userID.
+				// session data is accessible on the request object.
+				// express creates the cookie for us automatically.
+				// just by adding a property, userId, to the req.session and assigning that property a value, user._id,
+				// we're telling express to either add the property of the session or create a new session if one doesn't exist.
+				req.session.userId = user._id;
+				return res.redirect('/profile');
+			}
+		});
+	} else {
+		var err = new Error('Email and password are required.');
+		err.status = 401; // 'unauthorized' - for missing or bad authentication
+		return next(err);
+	}
 });
 
 // GET /register
@@ -45,6 +66,8 @@ router.post('/register', function(req, res, next) {
 			if (err) {
 				return next(err);
 			} else {
+				// this session assignment causes a person to automatically log in upon registration.
+				req.session.userId = user._id;
 				return res.redirect('/profile');
 			}
 		});
