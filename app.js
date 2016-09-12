@@ -15,6 +15,16 @@ app.use(session({
   saveUninitialized: false
 }))
 
+// make user ID available in templates
+app.use(function (req, res, next) {
+	// locals is a way to add info to the response object
+	// all views have access to locals object
+
+	// if user is logged in, userId will have a value, otherwise it is undefined
+	res.locals.currentUser = req.session.userId;
+	next();
+});
+
 // mongodb connection
 mongoose.connect("mongodb://localhost:27017/bookworm");
 var db = mongoose.connection;
