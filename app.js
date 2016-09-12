@@ -6,7 +6,7 @@ var app = express();
 
 // use sessions for tracking logins
 app.use(session({
-	// secret is only req. param. a string that is used to sign the session id cookie. more security.
+	// secret is only req. param. a string that is used to sign the session id cookie. this adds another layer of security, because it makes it difficult for someone to create a cookie in their browser to try and gain access to session data. 
 	secret: 'treehouse loves you',
 	// resave option forces the session to be saved in the session store, whether anything changed during the request or not.
   resave: true,
