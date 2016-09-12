@@ -22,6 +22,34 @@ var UserSchema = new mongoose.Schema({
 	}
 });
 
+// authenticate input against database documents
+// the statics object lets you add methods directly to the model, allowing you to call this method in other files (e.g. routes)
+UserSchema.statics.authenticate = function (email, password, callback){
+	User.findOne({ email: email })
+			.exec(function (err, user){
+				// exec method performs the search and provides a callback to process the results
+				if (err) {
+					return callback(err);
+				} else if (!user) {
+					// if email address wasn't in any document, return err
+					var err = new Error('User not found.');
+					err.status = 401;
+					return callback(err);
+				}
+				// if no errors, use .compare to compare supplied pass with hashed ver.
+				bcrypt.compare(password, user.password, function (err, result){
+					// comapre takes 3 args: plaintext pass, hashed pass, callback
+					// result is a boolean
+					if (result) {
+						return callback(null, user);
+						// the null above is for errors (following standard node pattern of err, followed by other args.
+						// In this successful case, there was no error, so a null value is appropriate.)
+					} else {
+						return callback();
+					}
+				});
+			});
+}
 // Mongoose offers a pre-save hook: essentially, a function
 // that runs before saving a record to Mongo
 // hash password before saving to database.
