@@ -4,13 +4,8 @@ var User = require('../models/user');
 var mid = require('../middleware'); // requiring a directory by name like this loads the index.js file within that directory
 
 // GET /profile
-router.get('/profile', function(req, res, next) {
-	// check for presence of session variable 'userId' to ensure user is logged in
-	if (!req.session.userId) {
-		var err = new Error('You are not authorized to view this page.');
-		err.status = 403; // 'forbidden'
-		return next(err);
-	}
+router.get('/profile', mid.requiresLogin, function(req, res, next) {
+	
 	User.findById(req.session.userId)
 			.exec(function (err, user) {
 				if (err) {
