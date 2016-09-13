@@ -2,7 +2,14 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var session = require('express-session');
+var MongoStore = require('connect-mongo')(session); // require and call with session in order to allow connect-mongo middleware to access sessions
 var app = express();
+
+// mongodb connection
+mongoose.connect("mongodb://localhost:27017/bookworm");
+var db = mongoose.connection;
+// mongo error
+db.on('error', console.error.bind(console, 'connection error:'));
 
 // use sessions for tracking logins
 app.use(session({
@@ -12,7 +19,11 @@ app.use(session({
   resave: true,
   // saveUninitialized forces an uninitialized session to be saved in the session store.
   // an uninitialized session is a new and not yet modified session.
-  saveUninitialized: false
+  saveUninitialized: false,
+  // store sets the sessionstore, mongostore constuctor function takes a config object
+  store: new MongoStore({
+  	mongooseConnection: db
+  })
 }))
 
 // make user ID available in templates
@@ -24,12 +35,6 @@ app.use(function (req, res, next) {
 	res.locals.currentUser = req.session.userId;
 	next();
 });
-
-// mongodb connection
-mongoose.connect("mongodb://localhost:27017/bookworm");
-var db = mongoose.connection;
-// mongo error
-db.on('error', console.error.bind(console, 'connection error:'));
 
 // parse incoming requests
 app.use(bodyParser.json());
